@@ -1,0 +1,38 @@
+// app global css in SCSS form
+.text-neutral {
+  color: #808080 !important;
+}
+.bg-neutral {
+  background: #808080 !important;
+}
+
+.text-secondary-2 {
+  color: #ff840d !important;
+}
+.bg-secondary-2 {
+  background: #ff840d !important;
+}
+
+.small-screen-only {
+  @media (max-width: $breakpoint-xs-max) {
+    display: block;
+  }
+  @media (min-width: $breakpoint-sm-max) {
+    display: none;
+  }
+}
+
+.large-screen-only {
+  @media (max-width: $breakpoint-sm-max) {
+    display: none;
+  }
+  @media (min-width: $breakpoint-sm-max) {
+    display: block;
+  }
+}
+
+.center-container {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
