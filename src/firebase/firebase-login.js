@@ -2,7 +2,7 @@ import { auth } from "./index.js";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Loading, Notify } from "quasar";
 
-const login = (data) => {
+export const login = (data) => {
   return new Promise((resolve, reject) => {
     Loading.show();
 
@@ -10,6 +10,7 @@ const login = (data) => {
       .then((userCredential) => {
         Loading.hide();
         resolve(userCredential.user);
+        alert('Successfully login! Please login.');
       })
       .catch((err) => {
         Loading.hide();

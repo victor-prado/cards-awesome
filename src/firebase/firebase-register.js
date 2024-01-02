@@ -14,6 +14,7 @@ const register = (data) => {
 
         Loading.hide();
         resolve(userCredential.user);
+        alert('Successfully registered! Please login.');
       })
       .catch((err) => {
         Loading.hide();
