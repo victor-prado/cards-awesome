@@ -4,14 +4,8 @@
       <q-spinner-dots v-if="loading" color="secondary" size="80px" />
       <div v-else>
         <q-list separator dark>
-          <q-item
-            v-for="card in cards"
-            :key="card.multiverseid"
-            clickable
-            :to="{ name: 'card', params: { id: card.id } }"
-            v-ripple
-            dark
-          >
+          <q-item v-for="card in cards" :key="card.multiverseid" clickable :to="{ name: 'card', params: { id: card.id } }"
+            v-ripple dark>
             <q-item-section avatar>
               <q-avatar square class="card-img-item">
                 <q-img :src="card.imageUrl" :alt="card.name" />
@@ -60,7 +54,7 @@ export default defineComponent({
     //this.loading = false;
   },
 
-  created() {},
+  created() { },
 
   methods: {
     handleLoad() {
@@ -72,10 +66,14 @@ export default defineComponent({
 
 <style>
 .card-img-item {
-  width: 72px; /* Set the desired width */
-  height: auto; /* Let the height adjust to maintain aspect ratio */
-  display: inline-block; /* Ensure proper alignment */
-  overflow: hidden; /* Hide any overflow if the image is larger */
+  width: 72px;
+  /* Set the desired width */
+  height: auto;
+  /* Let the height adjust to maintain aspect ratio */
+  display: inline-block;
+  /* Ensure proper alignment */
+  overflow: hidden;
+  /* Hide any overflow if the image is larger */
 }
 
 .rounded-fram {

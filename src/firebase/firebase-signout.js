@@ -1,10 +1,8 @@
-// src/firebase/firebase-signout.js
-
 import { auth } from "./index.js";
 import { signOut } from "firebase/auth";
 import { Loading, Notify } from "quasar";
 
-const signOutUser = () => {
+export const signOutUser = () => {
   return new Promise((resolve, reject) => {
     Loading.show();
 

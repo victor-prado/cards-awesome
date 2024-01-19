@@ -13,10 +13,12 @@
     "build": "quasar build"
   },
   "dependencies": {
+    "@extractus/feed-extractor": "^7.0.8",
     "@quasar/extras": "^1.0.0",
     "axios": "^1.4.0",
     "firebase": "^10.6.0",
     "quasar": "^2.6.0",
+    "rss-to-json": "^2.1.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
   },

@@ -1,52 +1,49 @@
 <template>
   <q-layout view="hHh lpR fFf">
     <q-header class="bg-grey-10 clear-border" dark bordered>
-      <q-toolbar>
+      <q-toolbar class="">
         <q-btn flat text-color="secondary-2" @click="$router.go(-1)">
           <q-icon name="eva-arrow-ios-back-outline" />
         </q-btn>
 
         <div class="absolute-center custom-standout">
           <q-form @submit="onSearch(searchInput)">
-            <q-input
-              dark
-              v-model="searchInput"
-              rounded
-              standout="bg-grey-9"
-              dense
-              @focus="searchBarFocused = true"
-              @blur="searchBarFocused = false"
-            >
+            <q-input dark v-model="searchInput" rounded standout="bg-grey-9" dense @focus="searchBarFocused = true"
+              @blur="searchBarFocused = false">
               <template v-slot:append>
                 <q-icon name="eva-search" color="grey-1" />
               </template>
             </q-input>
           </q-form>
         </div>
+        <div v-if="currentUser" class="q-ml-auto q-pr-md" @click="showUserInfo">
+          <q-avatar size="md">
+            <img src="/avatar2.png">
+          </q-avatar>
+
+          <q-menu dark touch-position>
+            <q-list style="min-width: 100px">
+              <q-item clickable v-close-popup>
+                <q-item-section>{{ currentUser.email }}</q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item @click="signoutCurrentUsert" clickable v-close-popup>
+                <q-item-section><a>Sign out</a></q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </div>
+        <div v-else class="q-ml-auto q-pr-md large-screen-only">
+          <q-btn label="Sign In" to="/login" />
+        </div>
       </q-toolbar>
     </q-header>
-    <q-drawer
-      v-model="drawer"
-      show-if-above
-      :width="180"
-      :breakpoint="500"
-      dark
-      bordered
-      class="large-screen-only bg-grey-10"
-    >
+    <q-drawer v-model="drawer" show-if-above :width="180" :breakpoint="500" dark bordered
+      class="large-screen-only bg-grey-10">
       <q-scroll-area class="fit">
-        <div
-          class="center-containe absolute-lef absolute-center fixed-cente flex-center"
-          style="padding-left: 6px"
-        >
+        <div class="center-containe absolute-lef absolute-center fixed-cente flex-center" style="padding-left: 6px">
           <q-list padding class="menu-list" active-color="secondary">
-            <q-item
-              v-for="(item, index) in menuList"
-              :key="index"
-              clickable
-              v-ripple
-              :to="item.path"
-            >
+            <q-item v-for="(item, index) in menuList" :key="index" clickable v-ripple :to="item.path">
               <q-item-section>{{ item.label }}</q-item-section>
               <q-item-section avatar>
                 <q-icon :name="item.icon" />
@@ -57,12 +54,8 @@
       </q-scroll-area>
     </q-drawer>
     <q-page-container>
-      <search-result-page
-        v-if="this.$route.name === 'search-result'"
-        :textInput="searchInput"
-        :cards="searchResult"
-        class="rounded-frame"
-      ></search-result-page>
+      <search-result-page v-if="this.$route.name === 'search-result'" :textInput="searchInput" :cards="searchResult"
+        class="rounded-frame"></search-result-page>
 
       <router-view v-else class="q-dark" />
     </q-page-container>
@@ -72,14 +65,10 @@
         <q-route-tab name="tabPrinc" :icon="princIcon" to="/home" />
         <q-route-tab name="tabCards" :icon="cardsIcon" to="/cards" />
         <q-route-tab name="tabAdd" :icon="addIcon" to="/add-card" />
-        <q-route-tab
-          name="tabSet"
-          :icon="setIcon"
-          :to="{
-            name: 'card',
-            params: { id: '6f8522de-9967-523d-9568-d0dab4547541' },
-          }"
-        />
+        <q-route-tab name="tabSet" :icon="setIcon" :to="{
+          name: 'card',
+          params: { id: '6f8522de-9967-523d-9568-d0dab4547541' },
+        }" />
         <q-route-tab name="tabUser" :icon="userIcon" to="/card-temp" />
       </q-tabs>
     </q-footer>
@@ -90,6 +79,9 @@
 import { defineComponent, ref } from "vue";
 import SearchResultPage from "src/pages/SearchResultPage.vue";
 import { api } from "boot/axios";
+import { auth } from "src/firebase/index";
+import { onAuthStateChanged } from 'firebase/auth';
+import { signOutUser } from "src/firebase/firebase-signout";
 
 //import EssentialLink from "components/EsprimaryentialLink.vue";
 
@@ -119,8 +111,20 @@ export default defineComponent({
       type: String,
       default: "eva-person-outline",
     },
+
   },
   methods: {
+    showUserInfo() {
+      console.log('Current User: ' + this.currentUser.email);
+    },
+
+    async signoutCurrentUsert() {
+      try {
+        await signOutUser()
+        this.$router.push('/home');
+      } catch (err) { }
+    },
+
     onSearch(textInput) {
       if (this.$route.name === "search-result") {
         api
@@ -150,6 +154,7 @@ export default defineComponent({
 
       console.log("submited");
     },
+
   },
 
   watch: {
@@ -162,8 +167,21 @@ export default defineComponent({
     },
   },
 
+  mounted() {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in.
+        this.currentUser = user;
+      } else {
+        // No user is signed in.
+        this.currentUser = null;
+      }
+    });
+  },
+
   data() {
     return {
+      currentUser: null,
       showSearchBar: false,
       searchInput: "",
       searchIconColor: "white",
@@ -199,7 +217,7 @@ export default defineComponent({
     };
   },
 
-  setup() {},
+  setup() { },
 });
 </script>
 
@@ -221,7 +239,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* 100% of the viewport height */
+  height: 100vh;
+  /* 100% of the viewport height */
 }
 
 .q-footer .q-tab {
@@ -233,11 +252,13 @@ body {
 }
 
 .custom-standout input[type="text"] {
-  color: white; /* Change the color of the typed text */
+  color: white;
+  /* Change the color of the typed text */
 }
 
 .custom-standout input[type="text"]:focus {
-  color: green; /* Change the color of the typed text */
+  color: green;
+  /* Change the color of the typed text */
 }
 
 .q-drawer--left.q-drawer--bordered {

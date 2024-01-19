@@ -2,13 +2,13 @@
   <q-page class="flex flex-center">
     <q-form ref="form" @submit="submit">
       <div class="col" style="max-width: 300px">
-        <q-input filled dense v-model="user.email" bg-color="neutral" color="secondary" label-color="dark"
+        <q-input outlined rounded dense v-model="user.email" bg-color="neutral" color="secondary" label-color="dark"
           label="Email" />
-        <q-input filled dense v-model="user.password" class="q-mt-md" bg-color="neutral" color="secondary"
-          label-color="dark" label="Password" />
+        <q-input outlined rounded dense v-model="user.password" type="password" class="q-mt-md" bg-color="neutral"
+          color="secondary" label-color="dark" label="Password" />
         <div class="q-mt-lg">
-          <q-btn flat color="primary" class="q-mr-sm" text-color="grey-1" label="Login" type="submit" />
-          <q-btn color="primary" text-color="grey-1" label="Register" to="/register" />
+          <q-btn rounded flat color="primary" class="q-mr-sm" text-color="grey-1" label="Login" type="submit" />
+          <q-btn rounded color="primary" text-color="grey-1" label="Register" to="/register" />
         </div>
       </div>
     </q-form>
@@ -17,7 +17,7 @@
 
 <script>
 import { login } from "src/firebase/firebase-login";
-import router from "src/router";
+// import router from "src/router";
 import { defineComponent } from "vue";
 import { ref, reactive } from 'vue';
 
@@ -34,7 +34,7 @@ export default defineComponent({
       if (form.value.validate()) {
         try {
           await login(user)
-          this.$router.push('/home')
+          this.$router.push('/home');
         } catch (err) { }
       }
     };

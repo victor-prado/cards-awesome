@@ -10,7 +10,6 @@ export const login = (data) => {
       .then((userCredential) => {
         Loading.hide();
         resolve(userCredential.user);
-        alert('Successfully login! Please login.');
       })
       .catch((err) => {
         Loading.hide();
