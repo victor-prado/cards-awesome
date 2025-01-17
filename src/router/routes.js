@@ -5,7 +5,7 @@ const routes = [
     children: [
       { path: "", component: () => import("pages/main/HomePage.vue") },
       { path: "/home", component: () => import("pages/main/HomePage.vue") },
-      { path: "/cards", component: () => import("pages/main/LoginPage.vue") },
+      { path: "/cards", component: () => import("pages/main/CardsPage.vue") },
       {
         path: "/add-card",
         component: () => import("pages/main/AddCardPage.vue"),
@@ -40,6 +40,15 @@ const routes = [
       {
         path: "/login",
         component: () => import("pages/main/LoginPage.vue"),
+      },
+      {
+        path: "/article/:id",
+        name: "article",
+        component: () => import("pages/ArticlePage.vue"),
+      },
+      {
+        path: "/atemp",
+        component: () => import("pages/APTemp.vue"),
       },
     ],
   },

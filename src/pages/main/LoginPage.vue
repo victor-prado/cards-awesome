@@ -16,14 +16,19 @@
 </template>
 
 <script>
+import { supabase } from "src/supabase";
 import { login } from "src/firebase/firebase-login";
 // import router from "src/router";
+import { useRouter } from "vue-router";
 import { defineComponent } from "vue";
 import { ref, reactive } from 'vue';
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "LoginPage",
   setup() {
+    const $q = useQuasar();
+    const router = useRouter();
     const user = reactive({
       email: null,
       password: null
@@ -31,11 +36,16 @@ export default defineComponent({
     const form = ref(null);
 
     const submit = async () => {
-      if (form.value.validate()) {
-        try {
-          await login(user)
-          this.$router.push('/home');
-        } catch (err) { }
+      const { lUser, session, error } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: user.password
+      });
+      if (error) {
+        $q.notify({ type: 'negative', message: error.message });
+      } else {
+        $q.notify({ type: 'positive', message: 'Login Successful' });
+        // const router = useRouter();
+        router.push('/home');
       }
     };
 

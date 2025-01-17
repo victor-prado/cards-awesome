@@ -38,26 +38,30 @@
         </div>
       </q-toolbar>
     </q-header>
-    <q-drawer v-model="drawer" show-if-above :width="180" :breakpoint="500" dark bordered
-      class="large-screen-only bg-grey-10">
-      <q-scroll-area class="fit">
-        <div class="center-containe absolute-lef absolute-center fixed-cente flex-center" style="padding-left: 6px">
-          <q-list padding class="menu-list" active-color="secondary">
-            <q-item v-for="(item, index) in menuList" :key="index" clickable v-ripple :to="item.path">
-              <q-item-section>{{ item.label }}</q-item-section>
-              <q-item-section avatar>
-                <q-icon :name="item.icon" />
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </div>
-      </q-scroll-area>
-    </q-drawer>
+    <div class="large-screen-only">
+      <q-drawer v-model="drawer" show-if-above overlay persistent :width="180" :breakpoint="500" dark bordered
+        class="bg-grey-10 fixed-position" style="position: fixed;">
+        <q-scroll-area class="fit">
+          <div class="fixed-top-lef" style="padding-left: 6px">
+            <q-list padding class="menu-list" active-color="secondary">
+              <q-item v-for="(item, index) in menuList" :key="index" clickable v-ripple :to="item.path">
+                <q-item-section>{{ item.label }}</q-item-section>
+                <q-item-section avatar>
+                  <q-icon :name="item.icon" />
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </div>
+        </q-scroll-area>
+      </q-drawer>
+    </div>
     <q-page-container>
-      <search-result-page v-if="this.$route.name === 'search-result'" :textInput="searchInput" :cards="searchResult"
-        class="rounded-frame"></search-result-page>
+      <div class="my-padding">
+        <search-result-page v-if="this.$route.name === 'search-result'" :textInput="searchInput" :cards="searchResult"
+          class="rounded-frame"></search-result-page>
 
-      <router-view v-else class="q-dark" />
+        <router-view v-else class="q-dark" />
+      </div>
     </q-page-container>
 
     <q-footer class="bg-dark small-screen-only clear-border" dark bordered>
@@ -79,9 +83,12 @@
 import { defineComponent, ref } from "vue";
 import SearchResultPage from "src/pages/SearchResultPage.vue";
 import { api } from "boot/axios";
-import { auth } from "src/firebase/index";
-import { onAuthStateChanged } from 'firebase/auth';
+// import { auth } from "src/firebase/index";
+// import { onAuthStateChanged } from 'firebase/auth';
 import { signOutUser } from "src/firebase/firebase-signout";
+
+import { supabase } from "src/supabase";
+import { useQuasar } from "quasar";
 
 //import EssentialLink from "components/EsprimaryentialLink.vue";
 
@@ -119,10 +126,17 @@ export default defineComponent({
     },
 
     async signoutCurrentUsert() {
-      try {
-        await signOutUser()
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        this.$q.notify({ type: 'negative', message: error.message });
+      } else {
+        this.$q.notify({ type: 'positive', message: 'User Signed out' });
         this.$router.push('/home');
-      } catch (err) { }
+      }
+      // try {
+      //   await signOutUser()
+      //   this.$router.push('/home');
+      // } catch (err) { }
     },
 
     onSearch(textInput) {
@@ -168,15 +182,27 @@ export default defineComponent({
   },
 
   mounted() {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
+    // onAuthStateChanged(auth, (user) => {
+    //   if (user) {
+    //     // User is signed in.
+    //     this.currentUser = user;
+    //   } else {
+    //     // No user is signed in.
+    //     this.currentUser = null;
+    //   }
+    // });
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log(event, session)
+
+      if (session) {
         // User is signed in.
-        this.currentUser = user;
+        this.currentUser = session.user;
       } else {
         // No user is signed in.
         this.currentUser = null;
       }
-    });
+    })
   },
 
   data() {
@@ -187,6 +213,7 @@ export default defineComponent({
       searchIconColor: "white",
       searchResult: [],
       searchBarFocused: false,
+      $q: useQuasar(),
       menuList: [
         {
           icon: "eva-home-outline",
@@ -206,7 +233,7 @@ export default defineComponent({
         {
           icon: "eva-settings-2-outline",
           label: "Setting",
-          path: "/settings",
+          path: "/atemp",
         },
         {
           icon: "eva-person-outline",
@@ -263,5 +290,12 @@ body {
 
 .q-drawer--left.q-drawer--bordered {
   border-right: 1px solid rgba(255, 255, 255, 0.12);
+  position: fixed;
+}
+
+.my-padding {
+  @media (min-width: $breakpoint-sm-max) {
+    padding-left: 180px;
+  }
 }
 </style>

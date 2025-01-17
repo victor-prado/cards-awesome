@@ -15,8 +15,11 @@
   "dependencies": {
     "@extractus/feed-extractor": "^7.0.8",
     "@quasar/extras": "^1.0.0",
-    "axios": "^1.4.0",
+    "@supabase/supabase-js": "^2.43.6",
+    "axios": "^1.6.7",
     "firebase": "^10.6.0",
+    "json-server": "^1.0.0-beta.3",
+    "node-html-parser": "^6.1.12",
     "quasar": "^2.6.0",
     "rss-to-json": "^2.1.1",
     "vue": "^3.0.0",

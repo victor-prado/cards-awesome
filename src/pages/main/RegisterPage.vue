@@ -8,8 +8,8 @@
           label-color="dark" label="Email" />
         <q-input outlined rounded dense v-model="user.password" type="password" class="q-mt-md" bg-color="neutral"
           color="secondary" label-color="dark" label="Password" />
-        <q-input outlined rounded dense v-model="user.confirmPassword" type="password" class="q-mt-md" bg-color="neutral"
-          color="secondary" label-color="dark" label="Confirm Password" />
+        <q-input outlined rounded dense v-model="user.confirmPassword" type="password" class="q-mt-md"
+          bg-color="neutral" color="secondary" label-color="dark" label="Confirm Password" />
         <div class="q-mt-lg">
           <q-btn rounded color="primary" text-color="grey-1" type="submit" label="Register" />
           <q-btn rounded flat color="primary" class="q-mr-sm" text-color="grey-1" label="Back to Login" to="/login" />
@@ -24,6 +24,8 @@ import { defineComponent } from "vue";
 import { ref, reactive } from "vue";
 import register from "src/firebase/firebase-register";
 import { useRouter } from "vue-router";
+import { supabase } from "src/supabase";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "RegisterPage",
@@ -39,6 +41,7 @@ export default defineComponent({
   //   }
   // },
   setup() {
+    const $q = useQuasar();
     const user = reactive({
       name: null,
       email: null,
@@ -48,7 +51,21 @@ export default defineComponent({
     const form = ref(null);
 
     const submit = async () => {
-      if (form.value.validate() && !!(await register(user))) {
+      const { data, error } = await supabase.auth.signUp(
+        {
+          email: user.email,
+          password: user.password,
+          options: {
+            data: {
+              name: user.name,
+            }
+          }
+        }
+      )
+      if (error) {
+        $q.notify({ type: 'negative', message: error.message });
+      } else {
+        $q.notify({ type: 'positive', message: 'Register Successful' });
         const router = useRouter();
         router.push("/home");
       }
