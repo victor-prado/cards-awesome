@@ -4,15 +4,15 @@
     <div class="q-pa-md row items-start q-gutter-md justify-center">
       <q-card class="my-card" dark>
         <div class="q-pa-sm text-center bg-primar">
-          <h5>Total Cards: </h5>
-          <h4>1023</h4>
+          <div class="text-body2">Total Cards: </div>
+          <div class="text-h6">1023</div>
         </div>
       </q-card>
 
       <q-card class="my-card" dark>
         <div class="q-pa-sm text-center ">
-          <h5>Unique Cards: </h5>
-          <h4>876</h4>
+          <div class="text-body2">Unique Cards: </div>
+          <div class="text-h6">876</div>
         </div>
       </q-card>
 
@@ -22,15 +22,28 @@
     <!-- <template>
       <br />
     </template> -->
+    <h5 class="q-pl-xl">Valuable Cards</h5>
+    <!-- <q-separator class="q-px-xl" color="neutral" inset /> -->
+    <div class="flex q-pb-xl q-pt-sm q-px-md">
+      <div class="q-px-md q-pt-md" v-for="(card, index) in valuableCards" :key="index" style="width: 210px;">
+        <div class="card bg-secondar">
+          <q-img :src="card.image_uris.small" fit="contain" />
+          <div class="q-pt-sm text-body2 text-center">{{ card.name }}</div>
+          <div class="q-pt-sm text-body1 text-center">$ {{ card.prices.usd }}</div>
+          <q-separator v-if="report" color="neutral" inset />
+        </div>
+      </div>
+      <q-resize-observer @resize="onResize" />
+    </div>
+    <!-- <q-separator color="neutral" inset /> -->
 
 
-
-    <h4 class=" q-pl-xl">Articles</h4>
+    <h5 class="q-pl-xl">Articles</h5>
     <div class="q-pa-md row items-start q-gutter-md">
-      <q-card v-for="(item, index) in feedItems" :key="index" class="my-card" dark>
+      <q-card v-for="(item, index) in feedItems" :key="index" class="my-card no-shadow" dark>
 
         <q-card-section>
-          <div class="text-h6">{{ item.title }}</div>
+          <div class="text-body1">{{ item.title }}</div>
           <div class="text-subtitle2">{{ item.author }}</div>
         </q-card-section>
 
@@ -69,19 +82,16 @@
 
 <script>
 import { defineComponent, onMounted } from "vue";
-import { extract, extractFromXml } from '@extractus/feed-extractor';
-import { api } from "src/boot/axios";
-// import { parse } from "rss-to-json"
 import { ref } from 'vue';
-import axios from 'axios';
-import { parse } from 'node-html-parser';
-import { fetchRss } from "src/api/api";
+import { fetchRss, fetchMostValuable } from "src/api/api";
 
 export default defineComponent({
   name: "HomePage",
 
   setup() {
     const feedItems = ref([]);
+    const valuableCards = ref([]);
+    const report = ref(null);
 
     const openUrl = (url) => {
       window.open(url, '_blank');
@@ -90,20 +100,33 @@ export default defineComponent({
     onMounted(
       async () => {
         feedItems.value = await fetchRss()
-        console.log('feedItems', feedItems.value)
+        // console.log('feedItems', feedItems.value)
+        valuableCards.value = await fetchMostValuable(5)
       }
     );
     return {
       feedItems,
-      openUrl
+      valuableCards,
+      openUrl,
+      report,
+
+      onResize(size) {
+        report.value = size.height > 400
+        console.log('size ', size)
+      }
     }
   }
 });
 </script>
 
-<style>
+<style lang="scss" scoped>
 .my-card {
   width: 100%;
   max-width: 250px;
+  border-radius: 50px;
+}
+
+.no-shadow {
+  box-shadow: none;
 }
 </style>
