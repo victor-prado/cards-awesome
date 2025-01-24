@@ -37,3 +37,15 @@ export async function fetchMostValuable(total) {
     }
     return []
 }
+
+export async function fetchCard(cardId) {
+    try {
+        const cards = await fetchCollection()
+        const card = cards.find(c => c.id === cardId)
+        console.log('card ', card)
+        return card
+    } catch (error) {
+        console.log('Error  fetching or parsing card: ', error);
+    }
+    return null
+}

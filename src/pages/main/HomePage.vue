@@ -26,9 +26,24 @@
     <!-- <q-separator class="q-px-xl" color="neutral" inset /> -->
     <div class="flex q-pb-xl q-pt-sm q-px-md">
       <div class="q-px-md q-pt-md" v-for="(card, index) in valuableCards" :key="index" style="width: 210px;">
-        <div class="card bg-secondar">
-          <q-img :src="card.image_uris.small" fit="contain" />
-          <div class="q-pt-sm text-body2 text-center">{{ card.name }}</div>
+        <div class="justify-center">
+          <!-- <a :href="'/card/' + card.id">
+            <q-img :src="card.image_uris.small" fit="contain" />
+          </a> -->
+          <router-link :to="'card/' + card.id">
+            <q-img :src="card.image_uris.small" fit="contain" />
+          </router-link>
+          <div class="q-pt-sm text-body1 text-center">
+            <router-link :to="'card/' + card.id" class="text-weight-light"
+              style="text-decoration: none; color: inherit">
+              {{ card.name }}
+            </router-link>
+          </div>
+          <!-- <a class="text-neutral" :href="'/card/' + card.id">
+            <div class="q-pt-sm text-body2 text-center">{{ card.name }}</div>
+          </a> -->
+
+          <!-- <q-btn :to="'card/' + card.id" flat color="neutral" :label="card.name" /> -->
           <div class="q-pt-sm text-body1 text-center">$ {{ card.prices.usd }}</div>
           <q-separator v-if="report" color="neutral" inset />
         </div>
@@ -53,7 +68,7 @@
           </router-link> -->
           <!-- <router-link :to="'///' + item.link" target="_blank"> -->
 
-          <q-btn @click="openUrl(item.link)" flat color="primary" label="Read Article" />
+          <q-btn @click="openUrl(item.link)" flat color="neutral" label="Read Article" />
           <!-- </router-link> -->
 
 
@@ -112,7 +127,7 @@ export default defineComponent({
 
       onResize(size) {
         report.value = size.height > 400
-        console.log('size ', size)
+        // console.log('size ', size)
       }
     }
   }

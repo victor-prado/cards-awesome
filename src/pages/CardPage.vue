@@ -1,64 +1,49 @@
 <template>
   <q-page class="flex flex-center">
-    <div class="q-pa-md">
-      <h1>{{ card.name }}</h1>
-      <img :src="card.imageUrl" :alt="card.name" class="card-image" />
-      <p><strong>Type:</strong> {{ card.type }}</p>
-      <p><strong>Description:</strong> {{ card.description }}</p>
+    <div v-if="loading">
+      <q-spinner color="primary" size="50px" />
+    </div>
+    <div v-else>
+      <div class="fit row wrap justify-center items-center content-start">
+        <div>
+          <q-img class="q-mx-aut" :src="card.image_uris.normal" style=" min-width: 240px;" />
+        </div>
+        <div class="text-body1 q-pa-md" style="max-width: 340px;">
+          <h4>{{ card.name }}</h4>
+          <div class="flex text-overline">
+            {{ card.rarity }} - {{ card.set_name }}
+          </div>
+          {{ card.oracle_text }}
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
 
 <script>
-import { defineComponent } from "vue";
-import { api } from "boot/axios";
+import { fetchCard } from "src/api/api";
+import { defineComponent, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
   name: "CardPage",
-  data() {
-    return {
-      loading: true,
-      card: null,
-    };
-  },
   setup() {
-    const route = useRoute();
-  },
+    // const cardId = ref(null)
+    const card = ref(null)
+    const route = useRoute()
+    const loading = ref(true);
 
-  async created() {
-    try {
-      const response = await api.get("/v1/cards", {
-        params: { id: this.$route.params.id },
-      });
-      this.card = response.data.cards[0];
-    } catch (error) {
-      console.error("MTG API Error: ", error);
-    } finally {
-      this.loading = false;
+    onMounted(
+      async () => {
+        const cardId = route.params.id
+        card.value = await fetchCard(cardId)
+        loading.value = false
+      }
+    )
+
+    return {
+      card, loading
     }
-  },
+  }
 });
 </script>
-
-<style scoped>
-.card-image {
-  max-width: 100%;
-  height: auto;
-  margin-top: 20px;
-}
-
-@media (min-width: 480) {
-  .card-info {
-    width: 265px;
-    height: 100%;
-  }
-}
-
-.card-img-item {
-  width: 265px; /* Set the desired width */
-  height: auto; /* Let the height adjust to maintain aspect ratio */
-  display: inline-block; /* Ensure proper alignment */
-  overflow: hidden; /* Hide any overflow if the image is larger */
-}
-</style>
