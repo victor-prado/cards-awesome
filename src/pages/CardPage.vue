@@ -7,7 +7,15 @@
       <div class="fit row wrap justify-center items-center content-start">
 
         <div>
-          <q-img :src="card.image_uris.normal" style=" min-width: 230px; " />
+          <q-img :src="card.image_uris.normal" style=" width: 230px; " />
+          <div v-if="false" class="q-pa-sm">
+            <q-btn class="q-pa-" color="primary" icon-right="eva-plus-square-outline" label="Add Card" />
+          </div>
+          <div v-else class="q-py-sm row">
+            <q-btn class="q-pa-" color="neutral" size="md" icon-right="eva-minus-circle-outline" label="Remove Card" />
+            <q-input class="q-pl-sm" dark v-model.number="copies" @blur="handleCopies" type="number" filled
+              style="max-width: 70px" />
+          </div>
         </div>
         <div class="text-body1 q-pa-md" style="max-width: 340px;">
           <h4>{{ card.name }}</h4>
@@ -18,48 +26,24 @@
           <!-- <q-separator color="neutral" /> -->
         </div>
       </div>
-      <div class="text-body2 q-pt-sm row ">
-        <div v-for="(item, index) in card.legalities.slice(0, 4)" :key="index"></div>
-        <div>
-          <div class="q-px-sm row" v-for="(item, index) in card.legalities.slice(0, 4)" :key="index">
-            <div>{{ item[0] }}</div>
-            <div class="q-pr-sm">:</div>
-            <div>{{ item[1] }}</div>
-          </div>
-        </div>
-        <div>
-          <div class="q-px-sm row" v-for="(item, index) in card.legalities.slice(4, 8)" :key="index">
-            <div>{{ item[0] }}</div>
-            <div class="q-pr-sm">:</div>
-            <div>{{ item[1] }}</div>
-          </div>
-        </div>
-        <div>
-          <div class="q-px-sm row" v-for="(item, index) in card.legalities.slice(8, 12)" :key="index">
-            <div>{{ item[0] }}</div>
-            <div class="q-pr-sm">:</div>
-            <div>{{ item[1] }}</div>
-          </div>
-        </div>
-        <div>
-          <div class="q-px-sm row" v-for="(item, index) in card.legalities.slice(12, 16)" :key="index">
-            <div>{{ item[0] }}</div>
-            <div class="q-pr-sm">:</div>
-            <div>{{ item[1] }}</div>
-          </div>
-        </div>
-        <div>
-          <div class="q-px-sm row" v-for="(item, index) in card.legalities.slice(16, 20)" :key="index">
-            <div>{{ item[0] }}</div>
-            <div class="q-pr-sm">:</div>
-            <div>{{ item[1] }}</div>
-          </div>
-        </div>
-        <div>
-          <div class="q-px-sm row" v-for="(item, index) in card.legalities.slice(20, 24)" :key="index">
-            <div>{{ item[0] }}</div>
-            <div class="q-pr-sm">:</div>
-            <div>{{ item[1] }}</div>
+      <!-- <q-separator color="neutral" /> -->
+      <div class="q-pa-sm">
+        <h5 class="q-px-sm">Legalties</h5>
+        <div class="text-body2 row ">
+          <div v-for="(c, i) in legalitiesCols" :key="i">
+            <div v-for="(item, index) in card.legalities.slice(c * legalitiesColSize, (c + 1) * legalitiesColSize)"
+              :key="index">
+              <div v-if="item[1] === 'Legal'" class="q-px-sm row text-weight-regular">
+                <div>{{ item[0] }}</div>
+                <!-- <div class="q-pr-sm">:</div> -->
+                <div><q-icon name="eva-checkmark-outline" /></div>
+              </div>
+              <div v-else class="q-px-sm row text-weight-thin">
+                <div>{{ item[0] }}</div>
+                <div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -79,24 +63,30 @@ export default defineComponent({
     const card = ref(null)
     const route = useRoute()
     const loading = ref(true);
-    const legalitiesColSize = ref(4)
+    const legalitiesColSize = ref(null)
     const legalitiesCols = ref([])
+    const copies = ref(null)
+
+    function handleCopies() {
+      alert("Sure you want to change the number of copies?")
+    }
 
     onMounted(
       async () => {
         const cardId = route.params.id
         card.value = await fetchCard(cardId)
         loading.value = false
-        legalitiesCols.value = (start, stop, step) =>
-          Array.from(
-            { length: (stop - start) / step + 1 },
-            (value, index) => start + index * step
-          );
+        legalitiesColSize.value = 4
+        const columns = (card.value.legalities.length - card.value.legalities.length % legalitiesColSize.value) / legalitiesColSize.value + 1
+        console.log('columns', columns)
+        console.log('legalities.legth', card.value.legalities.length)
+        legalitiesCols.value = [...Array(columns).keys()]
+        copies.value = 1
       }
     )
 
     return {
-      card, loading, legalitiesColSize
+      card, loading, legalitiesCols, legalitiesColSize, copies, handleCopies
     }
   }
 });
