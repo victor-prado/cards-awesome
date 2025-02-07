@@ -19,37 +19,17 @@
 
     </div>
 
+
+
     <!-- <template>
       <br />
     </template> -->
     <h5 class="q-pl-xl">Valuable Cards</h5>
     <!-- <q-separator class="q-px-xl" color="neutral" inset /> -->
-    <div class="flex q-pb-xl q-pt-sm q-px-md">
-      <div class="q-px-md q-pt-md" v-for="(card, index) in valuableCards" :key="index" style="width: 210px;">
-        <div class="justify-center">
-          <!-- <a :href="'/card/' + card.id">
-            <q-img :src="card.image_uris.small" fit="contain" />
-          </a> -->
-          <router-link :to="'card/' + card.id">
-            <q-img :src="card.image_uris.small" fit="contain" />
-          </router-link>
-          <div class="q-pt-sm text-body1 text-center">
-            <router-link :to="'card/' + card.id" class="text-weight-light"
-              style="text-decoration: none; color: inherit">
-              {{ card.name }}
-            </router-link>
-          </div>
-          <!-- <a class="text-neutral" :href="'/card/' + card.id">
-            <div class="q-pt-sm text-body2 text-center">{{ card.name }}</div>
-          </a> -->
+    <CardsList cards="valuableCards" />
+    <my-component title="Welcome to Quasar" description="This is a reusable component with props."
+      button-label="Learn More" @button-click="onButtonClick" />
 
-          <!-- <q-btn :to="'card/' + card.id" flat color="neutral" :label="card.name" /> -->
-          <div class="q-pt-sm text-body1 text-center">$ {{ card.prices.usd }}</div>
-          <q-separator v-if="report" color="neutral" inset />
-        </div>
-      </div>
-      <q-resize-observer @resize="onResize" />
-    </div>
     <!-- <q-separator color="neutral" inset /> -->
 
 
@@ -99,6 +79,8 @@
 import { defineComponent, onMounted } from "vue";
 import { ref } from 'vue';
 import { fetchRss, fetchMostValuable } from "src/api/api";
+import CardsList from "components/CardsList.vue"
+import MyComponent from "src/components/MyComponent.vue";
 
 export default defineComponent({
   name: "HomePage",

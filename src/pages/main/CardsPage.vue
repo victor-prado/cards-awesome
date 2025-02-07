@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <div class="row absolute-top">
+    <div class="row absolute-top" style="height: 10px">
       <q-card class="filter-card">
         <q-card-section>
           <div class="q-pa-md">
@@ -31,7 +31,30 @@
         </q-card-section>
       </q-card>
     </div>
-    <h1>Cards</h1>
+
+    <CardsList cards="cards" />
+    <!-- <div>
+      <q-list dense bordered padding class="rounded-borders">
+        <div class="flex">
+
+          <q-item v-for="(card, index) in cards" :key="index" clickable v-ripple>
+            <q-item-section>
+              {{ card.name }}
+            </q-item-section>
+          </q-item>
+        </div>
+      </q-list>
+    </div> -->
+    <!-- <h1>Cards</h1> -->
+
+    <div>
+      <!-- QTable to display the list -->
+      <q-table :rows="paginatedRows" :columns="columns" row-key="name" :pagination="pagination" hide-pagination dark />
+
+      <!-- QPagination for navigation -->
+      <q-pagination v-model="pagination.page" :max="totalPages" :max-pages="6" direction-links boundary-links dark
+        @update:model-value="updatePaginatedRows" />
+    </div>
   </q-page>
 </template>
 
@@ -46,10 +69,10 @@
 </style>
 
 <script>
+import { fetchCollection } from "src/api/api";
+import CardsList from "src/components/CardsList.vue";
 import { defineComponent, onMounted } from "vue";
-import { ref } from 'vue';
-import { db } from 'src/firebase/index';
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { ref, computed } from 'vue';
 
 export default defineComponent({
   name: "CardsPage",
@@ -58,24 +81,45 @@ export default defineComponent({
 
     const onDisplay = ref('cards');
     const cards = ref([]);
+    const columns = [
+      { name: 'name', label: 'Name', field: 'name', align: 'left' },
+      { name: 'set', label: 'Set', field: 'set_name', align: 'left' }
+    ]
 
-    const q = query(collection(db, "userCard"), where("userId", "==", 'x8AKqlzi3WKIU41q7Rte'));
+    const pagination = ref({
+      page: 1,
+      rowsPerPage: 9, // Number of rows per page
+    });
 
-    const loadCards = async () => {
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        console.log(doc.id, " => ", doc.data());
-      });
-    }
+    // Computed property to calculate total pages
+    const totalPages = computed(() => Math.ceil(cards.value.length / pagination.value.rowsPerPage));
 
-    onMounted(() => {
-      return loadCards();
-    })
+    // Computed property to get paginated rows
+    const paginatedRows = computed(() => {
+      const start = (pagination.value.page - 1) * pagination.value.rowsPerPage;
+      const end = start + pagination.value.rowsPerPage;
+      return cards.value.slice(start, end);
+    });
+
+    // Method to update paginated rows when page changes
+    const updatePaginatedRows = () => {
+      // This is handled automatically by the computed property
+    };
+
+    onMounted(
+      async () => {
+        cards.value = await fetchCollection()
+      }
+    )
 
     return {
       onDisplay,
-      cards
+      cards,
+      columns,
+      pagination,
+      totalPages,
+      paginatedRows,
+      updatePaginatedRows,
     }
   }
 });

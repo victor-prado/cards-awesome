@@ -8,13 +8,34 @@
 
         <div>
           <q-img :src="card.image_uris.normal" style=" width: 230px; " />
-          <div v-if="false" class="q-pa-sm">
-            <q-btn class="q-pa-" color="primary" icon-right="eva-plus-square-outline" label="Add Card" />
+          <div v-if="false" class="q-py-sm">
+            <q-btn v-if="copies == 0" class="q-pa-" color="primary" icon="eva-plus-outline" label="Add Card" />
           </div>
           <div v-else class="q-py-sm row">
-            <q-btn class="q-pa-" color="neutral" size="md" icon-right="eva-minus-circle-outline" label="Remove Card" />
-            <q-input class="q-pl-sm" dark v-model.number="copies" @blur="handleCopies" type="number" filled
+            <q-btn v-if="copies == 0" class="q-pa-" color="primary" icon="eva-plus-outline" label="Add Card"
+              @click="newCopy = 1" />
+            <q-btn v-else class="q-pa-" size="md" :label='"In your collection: " + copies' @click="newCopy = 0" />
+            <q-popup-edit dark v-model.number="copies" :validate="val => val >= 0" v-slot="scope">
+              <q-input dark type="number" v-model.number="scope.value" dense autofocus @keyup.enter="scope.set"
+                @focus="scope.value += newCopy">
+                <template v-slot:after>
+                  <q-btn flat dense color="negative" icon="eva-close-circle" @click.stop.prevent="scope.cancel" />
+
+                  <q-btn flat dense color="positive" icon="eva-checkmark-circle-2" @click.stop.prevent="scope.set"
+                    :disable="scope.validate(scope.value) === false || scope.initialValue === scope.value" />
+                </template>
+              </q-input>
+              <!-- <q-btn class="q-pa-" size="md" label="Save" /> -->
+            </q-popup-edit>
+            <!-- <q-input class="q-pl-sm" dark v-model.number="copies" @blur="handleCopies" type="number" filled
               style="max-width: 70px" />
+            <div class="q-px-sm text-subtitle1 row">
+              In your collection: <div class="q-px-sm text-weight-bold">{{ copies }}</div>
+              <q-popup-edit v-model.number="copies" auto-save v-slot="scope">
+                <q-input type="number" v-model.number="scope.value" dense autofocus @keyup.enter="scope.set" />
+              </q-popup-edit>
+            </div> -->
+
           </div>
         </div>
         <div class="text-body1 q-pa-md" style="max-width: 340px;">
@@ -27,11 +48,21 @@
         </div>
       </div>
       <!-- <q-separator color="neutral" /> -->
+      <div class="q-px-sm">
+        <!-- <h5 class="q-px-sm">Prices</h5> -->
+        <div class="items-center text-body2 q-px-sm flex">
+          <!-- Price:  -->
+          <div class="">Estimated price:</div>
+          <div class="text-h6 q-pl-sm">${{ card.prices.usd }}</div>
+          <!-- <h5>${{ card.prices.usd }}</h5> -->
+        </div>
+      </div>
+      <!-- <q-separator color="neutral" /> -->
       <div class="q-pa-sm">
         <h5 class="q-px-sm">Legalties</h5>
         <div class="text-body2 row ">
-          <div v-for="(c, i) in legalitiesCols" :key="i">
-            <div v-for="(item, index) in card.legalities.slice(c * legalitiesColSize, (c + 1) * legalitiesColSize)"
+          <div v-for="( c, i ) in  legalitiesCols " :key="i">
+            <div v-for="( item, index ) in  card.legalities.slice(c * legalitiesColSize, (c + 1) * legalitiesColSize) "
               :key="index">
               <div v-if="item[1] === 'Legal'" class="q-px-sm row text-weight-regular">
                 <div>{{ item[0] }}</div>
@@ -52,8 +83,9 @@
 </template>
 
 <script>
+import { useQuasar } from "quasar";
 import { fetchCard } from "src/api/api";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
@@ -66,10 +98,51 @@ export default defineComponent({
     const legalitiesColSize = ref(null)
     const legalitiesCols = ref([])
     const copies = ref(null)
+    const $q = useQuasar()
+    const newCopy = ref(null)
 
-    function handleCopies() {
-      alert("Sure you want to change the number of copies?")
+    const showNotif = (image) => {
+      $q.notify({
+        message: 'Card added to collection.',
+        color: 'primary',
+        avatar: image
+      })
     }
+
+    // Watch for changes in 'count'
+    watch(copies, (newValue, oldValue) => {
+      const image = card.value.image_uris.small
+
+      if (newValue === oldValue || oldValue === null) {
+        return
+      }
+
+      if (oldValue == 0) {
+        $q.notify({
+          message: 'Card added to collection.',
+          color: 'positive',
+          avatar: image
+        })
+      } else if (newValue == 0) {
+        $q.notify({
+          message: 'Card removed from collection.',
+          color: 'negative',
+          avatar: image
+        })
+      } else {
+        $q.notify({
+          message: 'Number of copies updated.',
+          color: 'info',
+          avatar: image
+        })
+      }
+      // showNotif(card.image_uris.small)
+      // console.log(`Count changed from ${oldValue} to ${newValue}`);
+    });
+
+    // function handleCopies() {
+    //   alert("Sure you want to change the number of copies?")
+    // }
 
     onMounted(
       async () => {
@@ -82,11 +155,13 @@ export default defineComponent({
         console.log('legalities.legth', card.value.legalities.length)
         legalitiesCols.value = [...Array(columns).keys()]
         copies.value = 1
+        newCopy.value = 0
       }
     )
 
     return {
-      card, loading, legalitiesCols, legalitiesColSize, copies, handleCopies
+      card, loading, legalitiesCols, legalitiesColSize, copies, showNotif, newCopy
+
     }
   }
 });
