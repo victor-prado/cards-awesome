@@ -1,6 +1,6 @@
 <template>
-  <q-page class="flex flex-center">
-    <!-- <div class="row absolute-top" style="height: 10px">
+  <q-page>
+    <div class="row">
       <q-card class="filter-card">
         <q-card-section>
           <div class="q-pa-md">
@@ -11,9 +11,31 @@
           </div>
         </q-card-section>
       </q-card>
-    </div> -->
+    </div>
+
+    <div>
+      <div class="row justify-center">
+        <div class="q-pr-sm">
+          <q-btn icon="eva-arrow-left-outline" @click="prevPage" :disable="currentPage == 1" />
+        </div>
+        <div class="q-pl-sm">
+          <q-btn icon="eva-arrow-right-outline" @click="nextPage" />
+        </div>
+      </div>
+    </div>
 
     <CardsList :cards="cards" />
+
+    <div class="q-pb-md">
+      <div class="row justify-center">
+        <div class="q-pr-sm">
+          <q-btn icon="eva-arrow-left-outline" @click="prevPage" :disable="currentPage == 1" />
+        </div>
+        <div class="q-pl-sm">
+          <q-btn icon="eva-arrow-right-outline" @click="nextPage" />
+        </div>
+      </div>
+    </div>
 
     <!-- <div>
       <q-table :rows="paginatedRows" :columns="columns" row-key="name" :pagination="pagination" hide-pagination dark />
@@ -48,8 +70,24 @@ export default defineComponent({
 
   setup() {
 
-    // const onDisplay = ref('cards');
+    const onDisplay = ref('cards');
     const cards = ref([]);
+    const currentPage = ref(1)
+    const pageSize = 50
+
+    const nextPage = async () => {
+      currentPage.value++
+      //console.log('currentPage', currentPage.value)
+      cards.value = await fetchMostValuable(currentPage.value, pageSize)
+      console.log('cards', cards.value)
+    }
+
+    const prevPage = async () => {
+      currentPage.value--
+      //console.log('currentPage', currentPage.value)
+      cards.value = await fetchMostValuable(currentPage.value, pageSize)
+      console.log('cards', cards.value)
+    }
     // const columns = [
     //   { name: 'name', label: 'Name', field: 'name', align: 'left' },
     //   { name: 'set', label: 'Set', field: 'set_name', align: 'left' }
@@ -57,7 +95,7 @@ export default defineComponent({
 
     // const pagination = ref({
     //   page: 1,
-    //   rowsPerPage: 9, 
+    //   rowsPerPage: 9,
     // });
 
     // Computed property to calculate total pages
@@ -78,13 +116,16 @@ export default defineComponent({
     onMounted(
       async () => {
         // cards.value = await fetchCollection()
-        cards.value = await fetchMostValuable(500)
+        cards.value = await fetchMostValuable(1, pageSize)
       }
     )
 
     return {
-      // onDisplay,
+      onDisplay,
       cards,
+      currentPage,
+      nextPage,
+      prevPage,
       // columns,
       // pagination,
       // totalPages,

@@ -24,12 +24,18 @@ export async function fetchCollection() {
   return []
 }
 
-export async function fetchMostValuable(total) {
+export async function fetchMostValuable(page, pageSize) {
   try {
     const cards = await fetchCollection()
+    //console.log('cards', cards)
+    const start = (page - 1) * pageSize
+    console.log('start', start)
+    const end = start + pageSize
+    console.log('end', end)
     const mostValuable = cards.toSorted((a, b) => {
       return b.prices.usd - a.prices.usd
-    }).slice(0, total)
+    }).slice(start, end)
+    console.log('mostValuable', mostValuable)
     // console.log('expensives: ', mostValuable.map(c => c.prices.usd))
     return mostValuable
   } catch (error) {

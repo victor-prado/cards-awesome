@@ -114,7 +114,7 @@ export default defineComponent({
       async () => {
         feedItems.value = await fetchRss()
         // console.log('feedItems', feedItems.value)
-        valuableCards.value = await fetchMostValuable(5)
+        valuableCards.value = await fetchMostValuable(1, 5)
         setTimeout(() => {
           showLoader.value = true
         }, 300)

@@ -3,31 +3,31 @@
     <q-spinner-hourglass color="primary" size="4em"></q-spinner-hourglass>
   </div> -->
   <div>
-    <q-infinity-scroll @load="loadMore" :offset="100">
-      <div class="flex q-pb-xl q-pt-sm q-px-md">
-        <div class="q-px-md q-pt-md" v-for="(card, index) in visibleCards" :key="index" style="width: 210px;">
-          <div class="justify-center">
+    <!-- <q-infinite-scroll @load="loadMore" :offset="1500"> -->
+    <div class="flex q-pb-xl q-pt-sm q-px-md">
+      <div class="q-px-md q-pt-md" v-for="card in cards" :key="card.id" style="width: 210px;">
+        <div class="justify-center">
 
-            <router-link :to="'card/' + card.id">
-              <q-img :src="card?.image_uris?.small" fit="contain" />
+          <router-link :to="'card/' + card.id">
+            <q-img :src="card?.image_uris?.small" fit="contain" />
+          </router-link>
+          <div class="q-pt-sm text-body1 text-center">
+            <router-link :to="'card/' + card.id" class="text-weight-light"
+              style="text-decoration: none; color: inherit">
+              {{ card.name }}
             </router-link>
-            <div class="q-pt-sm text-body1 text-center">
-              <router-link :to="'card/' + card.id" class="text-weight-light"
-                style="text-decoration: none; color: inherit">
-                {{ card.name }}
-              </router-link>
-            </div>
-            <div class="q-pt-sm text-body1 text-center">$ {{ card.prices.usd }}</div>
-            <!-- <q-separator v-if="report" color="neutral" inset /> -->
           </div>
+          <div class="q-pt-sm text-body1 text-center">$ {{ card.prices.usd }}</div>
+          <!-- <q-separator v-if="report" color="neutral" inset /> -->
         </div>
       </div>
-    </q-infinity-scroll>
+    </div>
+    <!-- </q-infinite-scroll> -->
     <!-- <q-resize-observer @resize="onResize" /> -->
   </div>
 </template>
 <script>
-import { defineComponent, computed, onMounted, ref } from "vue";
+import { defineComponent, computed, onMounted, ref, watch } from "vue";
 
 export default defineComponent({
   name: "CardsList",
@@ -41,14 +41,26 @@ export default defineComponent({
     const visibleCards = ref([]);
     const chunkSize = 20;
     let currentIndex = 0;
-    const loadMore = (index, done) => {
-      setTimeout(() => {
-        const nextChunk = props.cards.slice(currentIndex, currentIndex + chunkSize);
-        visibleCards.value = visibleCards.value.concat(nextChunk);
-        currentIndex += chunkSize;
-        done();
-      }, 1000);
-    }
+    //const loadMore = (index, done) => {
+    //  //    console.log('visibleCards', visibleCards)
+    //  setTimeout(() => {
+    //    const nextChunk = props.cards.slice(currentIndex, currentIndex + chunkSize);
+    //    visibleCards.value = visibleCards.value.concat(nextChunk);
+    //    currentIndex += chunkSize;
+    //    done();
+    //  }, 1000);
+    //}
+
+    // Watch for changes to the `cards` prop
+    watch(
+      () => props.cards,
+      (newCards) => {
+        // Reset visibleCards when the cards prop changes
+        visibleCards.value = newCards.slice(0, chunkSize);
+      },
+      { immediate: true } // Trigger the watcher immediately on component mount
+    );
+
 
 
 
@@ -66,20 +78,24 @@ export default defineComponent({
 
     return {
       // isLoading: true
-      visibleCards, loadMore
+      visibleCards, //loadMore
     }
   },
 
-  // watch: {
-  //   cards: {
-  //     handler(newCards) {
-  //       if (newCards.length > 0) {
-  //         this.isLoading = false;
-  //       }
-  //     },
-  //     immediate: true
-  //   }
-  // }
+
+
+
+  //watch: {
+  //  cards: {
+  //    handler(newCards) {
+  //      if (newCards.length > 0) {
+  //        console.log('primeira carta', newCards[0].name)
+  //        //console.log('carta visivel', this.visibleCards[0].name)
+  //      }
+  //    },
+  //    immediate: true
+  //  }
+  //}
 });
 </script>
 <style scoped>
