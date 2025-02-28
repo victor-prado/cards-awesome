@@ -6,7 +6,7 @@
           <div class="q-pa-md">
             <div class="fit row wrap justify-center items-start content-start">
               <q-radio v-model="onDisplay" val="cards" color="secondary" label="Cards" />
-              <q-radio v-model="onDisplay" val="deck" color="secondary" label="Decks" />
+              <q-radio v-model="onDisplay" val="decks" color="secondary" label="Decks" />
             </div>
           </div>
         </q-card-section>
@@ -24,7 +24,12 @@
       </div>
     </div>
 
-    <CardsList :cards="cards" />
+    <div v-if="onDisplay == 'cards'">
+      <CardsList :cards="cards" />
+    </div>
+    <div v-else-if="onDisplay == 'decks'">
+      <DecksList :decks="decks" />
+    </div>
 
     <div class="q-pb-md">
       <div class="row justify-center">
@@ -57,21 +62,23 @@
 </style>
 
 <script>
-import { fetchCollection, fetchMostValuable } from "src/api/api";
+import { fetchCollection, fetchDecks, fetchMostValuable } from "src/api/api";
 import CardsList from "src/components/CardsList.vue";
+import DecksList from "src/components/DecksList.vue";
 import { defineComponent, onMounted } from "vue";
 import { ref, computed } from 'vue';
 
 export default defineComponent({
   name: "CardsPage",
   components: {
-    CardsList
+    CardsList, DecksList
   },
 
   setup() {
 
     const onDisplay = ref('cards');
     const cards = ref([]);
+    const decks = ref([]);
     const currentPage = ref(1)
     const pageSize = 50
 
@@ -117,12 +124,14 @@ export default defineComponent({
       async () => {
         // cards.value = await fetchCollection()
         cards.value = await fetchMostValuable(1, pageSize)
+        decks.value = await fetchDecks(1, pageSize)
       }
     )
 
     return {
       onDisplay,
       cards,
+      decks,
       currentPage,
       nextPage,
       prevPage,

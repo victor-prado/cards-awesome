@@ -29,17 +29,29 @@ export async function fetchMostValuable(page, pageSize) {
     const cards = await fetchCollection()
     //console.log('cards', cards)
     const start = (page - 1) * pageSize
-    console.log('start', start)
+    //console.log('start', start)
     const end = start + pageSize
-    console.log('end', end)
+    //console.log('end', end)
     const mostValuable = cards.toSorted((a, b) => {
       return b.prices.usd - a.prices.usd
     }).slice(start, end)
-    console.log('mostValuable', mostValuable)
+    //console.log('mostValuable', mostValuable)
     // console.log('expensives: ', mostValuable.map(c => c.prices.usd))
     return mostValuable
   } catch (error) {
     console.log('Error  fetching or parsing valuable cards: ', error);
+  }
+  return []
+}
+
+export async function fetchDecks(page, pageSize) {
+  try {
+    const url = 'http://localhost:8002/decks';
+    const res = await axios.get(url);
+    //console.log('decks', res.data)
+    return res.data
+  } catch (error) {
+    console.log('Error fetching or parsing decks: ', error)
   }
   return []
 }
@@ -59,7 +71,7 @@ export async function fetchCard(cardId) {
       //const legality = item.replace('_', ' ')
       const value = toTitleFormat(item[1].replace('_', ' '))
       const prop = toTitleFormat(item[0])
-      console.log(prop + ': ' + value)
+      //console.log(prop + ': ' + value)
       const obj = {}
       obj[prop] = value
       return [prop, value]
