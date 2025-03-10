@@ -10,7 +10,7 @@
 
           <router-link :to="'deck/' + deck.id">
             <div class="deck-image-wrapper">
-              <q-img :src="deck?.list[0]?.image_uris.small" fit="none" position="50% 20%"
+              <q-img :src="deck?.list[0]?.card?.image_uris?.small" fit="none" position="50% 20%"
                 style="height: 70px; width: 110px;" />
             </div>
           </router-link>
@@ -74,6 +74,7 @@ export default defineComponent({
 
     onMounted(
       async () => {
+        console.log('deck', props.decks)
         //const firstChunk = props.cards.slice(currentIndex, currentIndex + chunkSize);
         //visibleCards.value = visibleCards.value.concat(firstChunk);
       }

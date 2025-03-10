@@ -26,6 +26,11 @@ const routes = [
         component: () => import("pages/CardPage.vue"),
       },
       {
+        path: "/deck/:id",
+        name: "deck",
+        component: () => import("pages/DeckPage.vue"),
+      },
+      {
         path: "/card-temp",
         component: () => import("pages/main/CardTemp.vue"),
       },

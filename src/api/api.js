@@ -56,6 +56,18 @@ export async function fetchDecks(page, pageSize) {
   return []
 }
 
+export async function fetchDeck(deckId) {
+  try {
+    const decks = await fetchDecks(1, 5);
+    const deck = decks.filter(item => item.id === deckId)
+    console.log('deck', deck)
+    return deck[0];
+  } catch (error) {
+    console.log('Error fetching or parsing deck: ', error)
+  }
+  return []
+}
+
 function toTitleFormat(text) {
   const words = text.split(' ').map((w) => {
     return w.charAt(0).toUpperCase() + w.slice(1)
