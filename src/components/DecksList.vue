@@ -10,8 +10,8 @@
 
           <router-link :to="'deck/' + deck.id">
             <div class="deck-image-wrapper">
-              <q-img :src="deck?.list[0]?.card?.image_uris?.small" fit="none" position="50% 20%"
-                style="height: 70px; width: 110px;" />
+              <q-img :src="deck?.list?.mainBoard[0]?.card?.image_uris?.small" fit="none" position="50% 20%"
+                style="height: 70px; width: 110px; border-radius: 0px;" />
             </div>
           </router-link>
           <div class="q-pt-sm text-body1 text-center">
@@ -45,6 +45,7 @@ export default defineComponent({
   },
   setup(props) {
 
+    // const deckImage = ref(null)
     //const loadMore = (index, done) => {
     //  //    console.log('visibleCards', visibleCards)
     //  setTimeout(() => {
