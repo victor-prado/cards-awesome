@@ -12,6 +12,32 @@ export async function fetchRss() {
   return []
 }
 
+export async function searchCard(name) {
+  // try {
+  //   const url = 'https://api.scryfall.com/cards/search';
+  //   const res = await axios.get(url, {
+  //     params: { q: name + '+(game%3Apaper)' }
+  //   });
+  //   console.log('name', name)
+  //   console.log('res', res)
+  //   return res.data
+  // } catch (error) {
+  //   console.log('Error  fetching cards: ', error);
+  // }
+  // return []
+
+  try {
+    const collection = await fetchCollection();
+    const result = collection.filter(c => c.name.toLowerCase().includes(name.toLowerCase()))
+    // console.log('name', name)
+    // console.log('res', res)
+    return result
+  } catch (error) {
+    console.log('Error  fetching cards: ', error);
+  }
+  return []
+}
+
 export async function fetchCollection() {
   try {
     const url = 'http://localhost:8002/cards';
